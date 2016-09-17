@@ -1,13 +1,14 @@
 package io.policarp.splunk.logback.hec
 
+import java.nio.charset.Charset
+
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.LayoutBase
 import monix.eval.Task
-import org.http4s.client.asynchttpclient.AsyncHttpClient
-import org.http4s.{ Charset, _ }
-import scodec.bits.ByteVector
+import skinny.http.{ HTTP, Request }
 
 import scala.beans.BeanProperty
+import scala.concurrent.ExecutionContext
 
 trait SplunkHttpEventCollectorClient {
 
@@ -24,25 +25,26 @@ trait SplunkHttpEventCollectorClient {
   def postTask(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]): Task[Unit]
 }
 
-package object http4s {
+package object skinnyhttp {
 
   /**
-   * An implementation of SplunkHttpEventCollectorClient using http4s as the HTTP client
+   * An implementation of SplunkHttpEventCollectorClient using the skinny-framework's HTTP client
    */
-  trait Http4sHecClient extends SplunkHttpEventCollectorClient {
+  trait SkinnyHttpHecClient extends SplunkHttpEventCollectorClient {
 
-    private val httpClient = AsyncHttpClient()
-
-    private lazy val splunkHeaders = Headers(
-      Header("Authorization", s"Splunk ${Option(token).getOrElse("")}")
-    )
-
-    private def parse(event: ILoggingEvent, layout: LayoutBase[ILoggingEvent]): EntityBody = scalaz.stream.Process.eval {
-      scalaz.concurrent.Task.now(ByteVector(layout.doLayout(event).getBytes(Charset.`UTF-8`.nioCharset)))
-    }
+    implicit val ec: ExecutionContext
 
     override def postTask(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]) = Task[Unit] {
-      events.foreach(e => println(layout.doLayout(e)))
+
+      events.foreach(event => {
+
+        val request =
+          Request(splunkUrl)
+            .header("Authorization", s"Splunk ${Option(token).getOrElse("")}")
+            .body(layout.doLayout(event).getBytes(Charset.forName(HTTP.DEFAULT_CHARSET)), "application/json")
+
+        HTTP.asyncPost(request)
+      })
     }
   }
 
