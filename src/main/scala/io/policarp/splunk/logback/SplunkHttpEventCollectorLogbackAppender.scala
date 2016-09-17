@@ -41,7 +41,7 @@ trait SplunkHttpEventCollectorLogbackAppenderBase extends AppenderBase[ILoggingE
   }
 
   override def append(event: ILoggingEvent) = {
-    logPublisher.enqueue(event) // TODO add async feature
+    logPublisher.enqueue(event) // TODO add async feature and overflow strategy
   }
 }
 

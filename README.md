@@ -116,3 +116,6 @@ package object json {
 The base implementation uses the [skinny-framework's HTTP client](https://github.com/skinny-framework/skinny-framework). It is a tiny library and does not bring with it many dependencies. `SplunkHttpEventCollectorLogbackAppender` uses `SkinnyHttpHecClient` for HTTP communication.
 
 You can however bring in your own implementation by mixing in your own class that extends `SplunkHttpEventCollectorClient` with `SplunkHttpEventCollectorLogbackAppenderBase`.
+
+## Streaming
+_TODO_
