@@ -6,6 +6,8 @@ scalaVersion := "2.11.8"
 
 scalacOptions += "-target:jvm-1.7"
 
+unmanagedResourceDirectories in Compile += baseDirectory.value / "conf"
+
 libraryDependencies ++= Seq(
 
   "org.http4s" %% "http4s-async-http-client" % "0.14.6a",

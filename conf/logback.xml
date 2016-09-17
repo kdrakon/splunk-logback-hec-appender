@@ -13,9 +13,7 @@
 
         <layout class="io.policarp.splunk.logback.SplunkHttpEventCollectorJsonLayout">
             <source>testing-sean</source>
-            <custom>user=${USER}</custom>
-            <custom>OTHERf</custom>
-            <custom>OTHER=poop</custom>
+            <!--<custom>user=${USER}</custom>-->
         </layout>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">

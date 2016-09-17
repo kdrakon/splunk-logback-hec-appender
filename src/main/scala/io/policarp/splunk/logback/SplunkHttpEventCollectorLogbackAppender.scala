@@ -37,7 +37,7 @@ class SplunkHttpEventCollectorLogbackAppender extends AppenderBase[ILoggingEvent
     Header("Authorization", s"Splunk ${Option(token).getOrElse("")}")
   )
 
-  private val PostTask = (events: Seq[ILoggingEvent]) => Task {
+  private val PostTask = (events: Seq[ILoggingEvent]) => Task { // TODO refactor this out
     //httpClient.fetch(Request(Method.POST, headers = splunkHeaders, body = parse(event)))(r => ???)
     events.foreach(e => println(layout.doLayout(e)))
   }

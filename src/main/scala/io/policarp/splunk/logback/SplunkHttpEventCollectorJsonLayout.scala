@@ -7,6 +7,7 @@ import io.policarp.splunk.logback.BaseSplunkHttpEventCollectorJsonLayout.{ BaseJ
 import org.json4s.native.Serialization._
 
 import scala.beans.BeanProperty
+import scala.collection._
 
 trait BaseSplunkHttpEventCollectorJsonLayout extends LayoutBase[ILoggingEvent] {
 
@@ -41,7 +42,8 @@ object BaseSplunkHttpEventCollectorJsonLayout {
     callingLine: Option[String],
     callingFile: Option[String],
     exception: Option[String],
-    stacktrace: Option[List[String]]
+    stacktrace: Option[List[String]],
+    customFields: Option[mutable.HashMap[String, String]]
   ) extends EventJson
 }
 
@@ -63,8 +65,7 @@ object SplunkHttpEventCollectorJsonLayout {
       Option(proxy.getStackTraceElementProxyArray).map(stacktrace => {
         val length = stacktrace.length
         val list = stacktrace.iterator.take(max).map(trace =>
-          trace.getStackTraceElement.toString
-        ).toList
+          trace.getStackTraceElement.toString).toList
         list ++ (if (length > max) List("...") else Nil)
       })
     })
@@ -77,7 +78,7 @@ class SplunkHttpEventCollectorJsonLayout extends BaseSplunkHttpEventCollectorJso
 
   @BeanProperty var maxStackTrace: Int = 500
 
-  private val customFields = new scala.collection.mutable.HashMap[String, String]()
+  private val customFields = new mutable.HashMap[String, String]()
 
   def setCustom(customField: String): Unit = {
     customField.split("=", 2) match {
@@ -100,7 +101,8 @@ class SplunkHttpEventCollectorJsonLayout extends BaseSplunkHttpEventCollectorJso
       lineOfCallerConverter.convert(event).filterEmptyConversion,
       fileOfCallerConverter.convert(event).filterEmptyConversion,
       extendedThrowableProxyConverter.convert(event).filterEmptyConversion,
-      parseStackTrace(event, maxStackTrace)
+      parseStackTrace(event, maxStackTrace),
+      if (customFields.isEmpty) None else Some(customFields)
     )
 
     val baseJson = BaseJson(
