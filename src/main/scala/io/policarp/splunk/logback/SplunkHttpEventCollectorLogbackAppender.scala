@@ -60,7 +60,7 @@ private class LogPublisher(queueSize: Int)(implicit scheduler: Scheduler) extend
 
       override def request(n: Long) = if (!cancelled) {
         Task {
-          for (i <- 0L to n) {
+          for (i <- 1L to n) {
             subscriber.onNext(logQueue.take())
           }
         }.runAsync
