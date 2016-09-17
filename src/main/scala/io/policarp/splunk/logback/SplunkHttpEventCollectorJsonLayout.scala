@@ -98,7 +98,7 @@ class SplunkHttpEventCollectorJsonLayout extends BaseSplunkHttpEventCollectorJso
     implicit val format = org.json4s.DefaultFormats
 
     val eventJson = FullEventJson(
-      event.getMessage,
+      event.getFormattedMessage,
       event.getLevel.levelStr,
       event.getThreadName,
       event.getLoggerName,
