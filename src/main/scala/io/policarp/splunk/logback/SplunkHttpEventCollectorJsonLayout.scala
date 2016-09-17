@@ -3,7 +3,7 @@ package io.policarp.splunk.logback
 import ch.qos.logback.classic.pattern.{ ExtendedThrowableProxyConverter, _ }
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.LayoutBase
-import io.policarp.splunk.logback.BaseSplunkHttpEventCollectorJsonLayout.{ BaseJson, FullEventJson }
+import io.policarp.splunk.logback.json.{ BaseJson, FullEventJson }
 import org.json4s.native.Serialization._
 
 import scala.beans.BeanProperty
@@ -21,7 +21,7 @@ trait BaseSplunkHttpEventCollectorJsonLayout extends LayoutBase[ILoggingEvent] {
   @BeanProperty var index: String = ""
 }
 
-object BaseSplunkHttpEventCollectorJsonLayout {
+package object json {
 
   trait EventJson
 
