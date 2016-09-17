@@ -2,9 +2,9 @@
 
 **still under construction**
 
-This is a [Logback Appender](http://logback.qos.ch/manual/appenders.html) made for Splunk's HTTP Event Collector (HEC) API. Splunk provides their [own appenders](https://github.com/splunk/splunk-library-javalogging), but at the time of this libraries creation, they were quite limited in terms of configuration and the data you could append to log indexes. It provides much more logging data than the current standard Splunk appender — which supplies only log *messages* and *severity*.
+This is a [Logback Appender](http://logback.qos.ch/manual/appenders.html) made for Splunk's HTTP Event Collector (HEC) API. Splunk provides their [own appenders](https://github.com/splunk/splunk-library-javalogging), but at the time of this libraries creation, the Logback one was quite limited in terms of configuration and the data you could append to log indexes. This provides much more logging data than the current standard Splunk appender — which supplies only log *messages* and *severity*.
 
-One of the main things this appender does is based on the capabilities of [logstash-logback-encoder](https://github.com/logstash/logstash-logback-encoder): appending extra JSON fields or metadata to your log entries via [`customFields`](#splunkhttpeventcollectorjsonlayout).
+One of the additional features this appender provides is based on the capabilities of the [logstash-logback-encoder](https://github.com/logstash/logstash-logback-encoder): appending extra JSON fields or metadata to your log entries via [`customFields`](#splunkhttpeventcollectorjsonlayout).
 
 ## Configuration
 ### Sample XML Configuration
@@ -34,7 +34,6 @@ One of the main things this appender does is based on the capabilities of [logst
     </appender>
 
     <root level="DEBUG">
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="splunk"/>
     </root>
 
@@ -44,9 +43,11 @@ One of the main things this appender does is based on the capabilities of [logst
 ### SplunkHttpEventCollectorLogbackAppender
 ####Logback Configuration
 - `<splunkUrl>`
-  - The URL of the HEC endpoint (e.g. https://somewhere.splunkcloud.com/services/collector/event)
+  - The URL of the HEC endpoint 
+  - e.g. https://somewhere.splunkcloud.com/services/collector/event
 - `<token>`
-  - The token that authorizes posting to the HEC endpoint (e.g. _1234-5678-91011-ABC-321_)
+  - The token that authorizes posting to the HEC endpoint
+  - e.g. _1234-5678-91011-ABC-321_
 - `<queue>`
   - A maximum queue size for log messages to be stored in memory. If this fills up and log messages are not posted to Splunk in a timely manner, then the queue will cause blocking to occur on subsequent appends. 
   - 1000 *(default)*
@@ -54,12 +55,12 @@ One of the main things this appender does is based on the capabilities of [logst
   - Log messages are buffered in memory off of the queue. Once a buffer is filled, logs are instantly posted to HEC endpoint.
   - 25 *(default)*
 - `<flush>`
-  - Specifies a timeout in seconds in which the buffer should be flushed regardless of the current number of logs in it.
+  - Specifies a timeout in seconds in which the buffer should be flushed regardless of the current number of logs in it. This ensures log messages don't stagnate.
   - 30 *(default)*
 - `<parallelism>`
   - Log messages are posted to the HEC endpoint in parallel. This number specifies how many parallel posts should happen asynchronously.
   
-The appender also supports the addition of [Logback Filter's](http://logback.qos.ch/manual/filters.html) — see XML the example above.
+The appender also supports the addition of [Logback Filter's](http://logback.qos.ch/manual/filters.html) — see the XML example above.
 
 ### SplunkHttpEventCollectorJsonLayout
 By default, the `SplunkHttpEventCollectorLogbackAppender` will use a default configured `SplunkHttpEventCollectorJsonLayout`. The JSON data is rendered using [json4s](https://github.com/json4s/json4s) from the following case classes:
