@@ -9,9 +9,11 @@ import org.json4s.native.Serialization._
 import scala.beans.BeanProperty
 import scala.collection._
 
+/**
+ * Base Logback LayoutBase class used for formatting log events in JSON for Splunk. This supplies
+ * the expected JSON format referenced here: http://dev.splunk.com/view/event-collector/SP-CAAAE6M
+ */
 trait BaseSplunkHttpEventCollectorJsonLayout extends LayoutBase[ILoggingEvent] {
-
-  // ref: http://dev.splunk.com/view/event-collector/SP-CAAAE6M
 
   @BeanProperty var host: String = ""
   @BeanProperty var source: String = ""
@@ -72,6 +74,10 @@ object SplunkHttpEventCollectorJsonLayout {
   }
 }
 
+/**
+ * This layout provides a 'good' amount of logging data from an ILoggingEvent. It also supports
+ * custom fields to append to every log message configurable via Logback.
+ */
 class SplunkHttpEventCollectorJsonLayout extends BaseSplunkHttpEventCollectorJsonLayout {
 
   import SplunkHttpEventCollectorJsonLayout._

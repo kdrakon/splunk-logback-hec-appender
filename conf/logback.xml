@@ -9,11 +9,12 @@
 
     <appender name="splunk" class="io.policarp.splunk.logback.SplunkHttpEventCollectorLogbackAppender">
 
+        <splunkUrl>htttp://somewhere.com/</splunkUrl>
         <buffer>1</buffer>
 
         <layout class="io.policarp.splunk.logback.SplunkHttpEventCollectorJsonLayout">
             <source>testing-sean</source>
-            <!--<custom>user=${USER}</custom>-->
+            <custom>user=${USER}</custom>
         </layout>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
