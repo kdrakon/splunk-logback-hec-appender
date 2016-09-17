@@ -18,5 +18,5 @@ object Test extends App {
     }
   }.start()
 
-  Thread.sleep(5000)
+  Thread.sleep(30000)
 }

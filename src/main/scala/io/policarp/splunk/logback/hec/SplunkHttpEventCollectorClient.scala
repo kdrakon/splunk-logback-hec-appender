@@ -4,6 +4,8 @@ import java.nio.charset.Charset
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.LayoutBase
+import ch.qos.logback.core.filter.Filter
+import ch.qos.logback.core.spi.FilterReply
 import monix.eval.Task
 import skinny.http.{ HTTP, Request }
 
@@ -45,6 +47,24 @@ package object skinnyhttp {
 
         HTTP.asyncPost(request)
       })
+    }
+  }
+
+  /**
+   * This filter is needed to stop the endless feedback loop from the skinny-framework
+   * HTTP Client's internal logging
+   */
+  class SkinnyHttpLogFilter extends Filter[ILoggingEvent] {
+
+    val HttpLoggerName = classOf[HTTP].getName
+
+    override def decide(event: ILoggingEvent): FilterReply = {
+      // check with startsWith due to $ appended with Scala classes
+      if (event.getLoggerName.startsWith(HttpLoggerName)) {
+        FilterReply.DENY
+      } else {
+        FilterReply.ACCEPT
+      }
     }
   }
 

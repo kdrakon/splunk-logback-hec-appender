@@ -5,7 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.AppenderBase
 import io.policarp.splunk.logback.hec.SplunkHttpEventCollectorClient
-import io.policarp.splunk.logback.hec.skinnyhttp.SkinnyHttpHecClient
+import io.policarp.splunk.logback.hec.skinnyhttp.{ SkinnyHttpHecClient, SkinnyHttpLogFilter }
 import monix.eval.Task
 import monix.execution.Scheduler
 import monix.reactive.{ Consumer, Observable }
@@ -16,6 +16,7 @@ import scala.concurrent.duration._
 
 class SplunkHttpEventCollectorLogbackAppender extends SplunkHttpEventCollectorLogbackAppenderBase with SkinnyHttpHecClient {
   implicit val ec = scala.concurrent.ExecutionContext.global // TODO replace
+  this.addFilter(new SkinnyHttpLogFilter())
 }
 
 trait SplunkHttpEventCollectorLogbackAppenderBase extends AppenderBase[ILoggingEvent] {
