@@ -117,5 +117,11 @@ The base implementation uses the [skinny-framework's HTTP client](https://github
 
 You can however bring in your own implementation by mixing in your own class that extends `SplunkHecClient` with `SplunkHecAppenderBase`.
 
+**Note**: the `SplunkHecAppender` has a Logback filter automatically added that filters out logging from the Skinny HTTP client to avoid an infinite feedback loop. To filter out logging in its entirety, append something like this to your config:
+
+```xml 
+<logger name="skinny.http" level="OFF"/>
+```
+
 ## Streaming
 _TODO_
