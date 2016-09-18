@@ -45,7 +45,7 @@ package object skinnyhttp {
             .header("Authorization", s"Splunk ${Option(token).getOrElse("")}")
             .body(layout.doLayout(event).getBytes(Charset.forName(HTTP.DEFAULT_CHARSET)), "application/json")
 
-        HTTP.asyncPost(request)
+        HTTP.post(request)
       })
     }
   }
