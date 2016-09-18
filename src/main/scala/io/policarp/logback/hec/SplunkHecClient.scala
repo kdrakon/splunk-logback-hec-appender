@@ -32,8 +32,11 @@ object SplunkHecClient {
   /**
    * Creates a newline separated list of individual Splunk JSON events
    */
-  def prepareJsonEvents(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]): String = {
-    events.map(event => layout.doLayout(event)).mkString("\n\n")
+  def prepareJsonEvents(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]): Option[String] = {
+    events match {
+      case Nil => None
+      case _ => Some(events.map(event => layout.doLayout(event)).mkString("\n\n"))
+    }
   }
 }
 
@@ -50,14 +53,14 @@ package object skinnyhttp {
 
     override def postTask(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]) = Task[Unit] {
 
-      val jsonEvents = prepareJsonEvents(events)
+      prepareJsonEvents(events).map(jsonEvents => {
+        val request =
+          Request(splunkUrl)
+            .header("Authorization", s"Splunk ${Option(token).getOrElse("")}")
+            .body(jsonEvents.getBytes(Charset.forName(HTTP.DEFAULT_CHARSET)), "application/json")
 
-      val request =
-        Request(splunkUrl)
-          .header("Authorization", s"Splunk ${Option(token).getOrElse("")}")
-          .body(jsonEvents.getBytes(Charset.forName(HTTP.DEFAULT_CHARSET)), "application/json")
-
-      HTTP.post(request)
+        HTTP.post(request)
+      })
     }
   }
 
