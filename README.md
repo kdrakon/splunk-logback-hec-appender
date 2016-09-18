@@ -84,13 +84,13 @@ package object json {
     level: String,
     thread: String,
     logger: String,
-    callingClass: Option[String],
-    callingMethod: Option[String],
-    callingLine: Option[String],
-    callingFile: Option[String],
-    exception: Option[String],
-    stacktrace: Option[List[String]],
-    customFields: Option[mutable.HashMap[String, String]]
+    callingClass: Option[String] = None,
+    callingMethod: Option[String] = None,
+    callingLine: Option[String] = None,
+    callingFile: Option[String] = None,
+    exception: Option[String] = None,
+    stacktrace: Option[List[String]] = None,
+    customFields: Option[mutable.HashMap[String, String]] = None
   ) extends EventJson
 }
 ```
