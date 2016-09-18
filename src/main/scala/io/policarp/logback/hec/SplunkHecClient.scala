@@ -1,4 +1,4 @@
-package io.policarp.splunk.logback.hec
+package io.policarp.logback.hec
 
 import java.nio.charset.Charset
 
@@ -12,7 +12,7 @@ import skinny.http.{ HTTP, Request }
 import scala.beans.BeanProperty
 import scala.concurrent.ExecutionContext
 
-trait SplunkHttpEventCollectorClient {
+trait SplunkHecClient {
 
   @BeanProperty var splunkUrl: String = ""
   @BeanProperty var token: String = ""
@@ -32,7 +32,7 @@ package object skinnyhttp {
   /**
    * An implementation of SplunkHttpEventCollectorClient using the skinny-framework's HTTP client
    */
-  trait SkinnyHttpHecClient extends SplunkHttpEventCollectorClient {
+  trait SkinnyHecClient extends SplunkHecClient {
 
     implicit val ec: ExecutionContext
 

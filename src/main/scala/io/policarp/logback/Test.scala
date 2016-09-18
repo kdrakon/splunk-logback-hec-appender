@@ -1,4 +1,4 @@
-package io.policarp.splunk.logback
+package io.policarp.logback
 
 import org.slf4j.LoggerFactory
 

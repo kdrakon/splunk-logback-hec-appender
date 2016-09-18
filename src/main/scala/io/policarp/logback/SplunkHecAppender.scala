@@ -1,11 +1,11 @@
-package io.policarp.splunk.logback
+package io.policarp.logback
 
 import java.util.concurrent.LinkedBlockingQueue
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.AppenderBase
-import io.policarp.splunk.logback.hec.SplunkHttpEventCollectorClient
-import io.policarp.splunk.logback.hec.skinnyhttp.{ SkinnyHttpHecClient, SkinnyHttpLogFilter }
+import io.policarp.logback.hec.SplunkHecClient
+import io.policarp.logback.hec.skinnyhttp.{ SkinnyHecClient, SkinnyHttpLogFilter }
 import monix.eval.Task
 import monix.execution.Scheduler
 import monix.reactive.{ Consumer, Observable }
@@ -14,13 +14,13 @@ import org.reactivestreams.{ Publisher, Subscriber, Subscription }
 import scala.beans.BeanProperty
 import scala.concurrent.duration._
 
-class SplunkHttpEventCollectorLogbackAppender extends SplunkHttpEventCollectorLogbackAppenderBase with SkinnyHttpHecClient {
+class SplunkHecAppender extends SplunkHecAppenderBase with SkinnyHecClient {
   implicit val ec = scala.concurrent.ExecutionContext.global // TODO replace
   this.addFilter(new SkinnyHttpLogFilter())
 }
 
-trait SplunkHttpEventCollectorLogbackAppenderBase extends AppenderBase[ILoggingEvent] {
-  self: SplunkHttpEventCollectorClient =>
+trait SplunkHecAppenderBase extends AppenderBase[ILoggingEvent] {
+  self: SplunkHecClient =>
 
   private implicit val scheduler = Scheduler.Implicits.global // TODO replace
 
@@ -28,7 +28,7 @@ trait SplunkHttpEventCollectorLogbackAppenderBase extends AppenderBase[ILoggingE
   @BeanProperty var buffer: Int = 25
   @BeanProperty var flush: Int = 30
   @BeanProperty var parallelism: Int = 8
-  @BeanProperty var layout: BaseSplunkHttpEventCollectorJsonLayout = new SplunkHttpEventCollectorJsonLayout()
+  @BeanProperty var layout: SplunkHecJsonLayoutBase = new SplunkHecJsonLayout()
 
   private lazy val logPublisher = new LogPublisher(queue)
   private lazy val logStream = Observable.fromReactivePublisher(logPublisher).bufferTimedAndCounted(flush seconds, buffer)

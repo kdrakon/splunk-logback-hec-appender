@@ -7,12 +7,12 @@
         </encoder>
     </appender>
 
-    <appender name="splunk" class="io.policarp.splunk.logback.SplunkHttpEventCollectorLogbackAppender">
+    <appender name="splunk" class="io.policarp.logback.SplunkHecAppender">
 
         <splunkUrl>htttp://somewhere.com/</splunkUrl>
         <buffer>1</buffer>
 
-        <layout class="io.policarp.splunk.logback.SplunkHttpEventCollectorJsonLayout">
+        <layout class="io.policarp.logback.SplunkHecJsonLayout">
             <source>testing-sean</source>
             <custom>user=${USER}</custom>
         </layout>

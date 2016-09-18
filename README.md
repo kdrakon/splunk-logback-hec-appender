@@ -13,34 +13,34 @@ One of the additional features this appender provides is based on the capabiliti
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <appender name="splunk" class="io.policarp.splunk.logback.SplunkHttpEventCollectorLogbackAppender">
+  <appender name="splunk" class="io.policarp.logback.SplunkHecAppender">
 
-        <splunkUrl>https://somewhere.splunkcloud.com/services/collector/event</splunkUrl>
-        <token>1234-5678-91011-ABC-321</token>
-        <buffer>25</buffer>
-        <flush>10</flush>
-        <parallelism>8</parallelism>
+    <splunkUrl>https://somewhere.splunkcloud.com/services/collector/event</splunkUrl>
+    <token>1234-5678-91011-ABC-321</token>
+    <buffer>25</buffer>
+    <flush>10</flush>
+    <parallelism>8</parallelism>
 
-        <layout class="io.policarp.splunk.logback.SplunkHttpEventCollectorJsonLayout">
-            <source>my-application</source>
-            <custom>appversion=${APP_VERSION}</custom>
-            <custom>user=${USER}</custom>
-        </layout>
+    <layout class="io.policarp.logback.SplunkHecJsonLayout">
+      <source>my-application</source>
+      <custom>appversion=${APP_VERSION}</custom>
+      <custom>user=${USER}</custom>
+    </layout>
 
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-        </filter>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
 
-    </appender>
+  </appender>
 
-    <root level="DEBUG">
-        <appender-ref ref="splunk"/>
-    </root>
+  <root level="DEBUG">
+    <appender-ref ref="splunk"/>
+  </root>
 
 </configuration>
 ```
 
-### SplunkHttpEventCollectorLogbackAppender
+### SplunkHecAppender
 ####Logback Configuration
 - `<splunkUrl>`
   - The URL of the HEC endpoint 
@@ -62,8 +62,8 @@ One of the additional features this appender provides is based on the capabiliti
   
 The appender also supports the addition of [Logback Filter's](http://logback.qos.ch/manual/filters.html) — see the XML example above.
 
-### SplunkHttpEventCollectorJsonLayout
-By default, the `SplunkHttpEventCollectorLogbackAppender` will use a default configured `SplunkHttpEventCollectorJsonLayout`. The JSON data is rendered using [json4s](https://github.com/json4s/json4s) from the following case classes:
+### SplunkHecJsonLayout
+By default, the `SplunkHecAppender` will use a default configured `SplunkHecJsonLayout`. The JSON data is rendered using [json4s](https://github.com/json4s/json4s) from the following case classes:
 
 ```scala
 package object json {
@@ -97,7 +97,7 @@ package object json {
 
 ####Logback Configuration
 - `<custom>`
-  - A custom field that is appended to log messages (`customFields`). This must be encoded as individual `<custom>` key-value pairs separated by an equal (`=`) sign. For example:
+  - A custom field that is appended to log messages (under the JSON field `customFields`). This must be encoded as individual `<custom>` tags with key-value pairs separated by an equal (`=`) sign. For example:
     - applicationVersion=${GIT_APP_VERSION}
     - applicationName=SuperCoolApp
 - `<maxStackTrace>`
@@ -110,12 +110,12 @@ package object json {
   - `<host>`
   
   ####Custom Layout
-  You can override the layout with a class extending either `SplunkHttpEventCollectorJsonLayout` `BaseSplunkHttpEventCollectorJsonLayout`, or `LayoutBase[ILoggingEvent]`. Then `<layout>` can be specified in the `<appender>` section to specify — see the XML example above
+  You can override the layout with a class extending either `SplunkHecJsonLayout`,`SplunkHecJsonLayoutBase`, or `LayoutBase[ILoggingEvent]`. Then `<layout>` can be specified in the `<appender>` section — see the XML example above
 
 ## HTTP Client
-The base implementation uses the [skinny-framework's HTTP client](https://github.com/skinny-framework/skinny-framework). It is a tiny library and does not bring with it many dependencies. `SplunkHttpEventCollectorLogbackAppender` uses `SkinnyHttpHecClient` for HTTP communication.
+The base implementation uses the [skinny-framework's HTTP client](https://github.com/skinny-framework/skinny-framework). It is a tiny library and does not bring with it many dependencies. `SplunkHecAppender` uses `SkinnyHttpHecClient` for HTTP communication.
 
-You can however bring in your own implementation by mixing in your own class that extends `SplunkHttpEventCollectorClient` with `SplunkHttpEventCollectorLogbackAppenderBase`.
+You can however bring in your own implementation by mixing in your own class that extends `SplunkHecClient` with `SplunkHecAppenderBase`.
 
 ## Streaming
 _TODO_
