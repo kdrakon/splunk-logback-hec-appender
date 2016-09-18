@@ -41,7 +41,11 @@ trait SplunkHecAppenderBase extends AppenderBase[ILoggingEvent] {
   }
 
   override def append(event: ILoggingEvent) = {
-    logPublisher.enqueue(event) // TODO add async feature and overflow strategy
+    Option(event).foreach(e => {
+      event.prepareForDeferredProcessing()
+      event.getCallerData
+      logPublisher.enqueue(event) // TODO add async feature and overflow strategy
+    })
   }
 }
 

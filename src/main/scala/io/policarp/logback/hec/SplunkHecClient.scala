@@ -53,7 +53,7 @@ package object skinnyhttp {
 
     override def postTask(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]) = Task[Unit] {
 
-      prepareJsonEvents(events).map(jsonEvents => {
+      prepareJsonEvents(events).foreach(jsonEvents => {
         val request =
           Request(splunkUrl)
             .header("Authorization", s"Splunk ${Option(token).getOrElse("")}")
