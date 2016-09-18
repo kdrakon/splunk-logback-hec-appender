@@ -2,9 +2,9 @@
 
 **still under construction**
 
-This is a [Logback Appender](http://logback.qos.ch/manual/appenders.html) made for Splunk's HTTP Event Collector (HEC) API. Splunk provides their [own appenders](https://github.com/splunk/splunk-library-javalogging), but at the time of this libraries creation, the Logback one was quite limited in terms of configuration and the data you could append to log indexes. This provides much more logging data than the current standard Splunk appender — which supplies only log *messages* and *severity*.
+This is a [Logback Appender](http://logback.qos.ch/manual/appenders.html) made for Splunk's HTTP Event Collector (HEC) API. Splunk provides their [own appenders](https://github.com/splunk/splunk-library-javalogging), but at the time of this libraries creation, the Logback one was quite limited in terms of configuration and the data you could append to log indexes. This appender provides much more logging data than the current standard Splunk appender — which supplies only log fields for *message* and *severity*. With the addition of JSON fields containing more logging metadata, complex Splunk search queries can be written. This can potentially lead to better insight into your application.
 
-One of the additional features this appender provides is based on the capabilities of the [logstash-logback-encoder](https://github.com/logstash/logstash-logback-encoder): appending extra JSON fields or metadata to your log entries via [`customFields`](#splunkhecjsonlayout).
+Some of the inspiration for this appender is based on the capabilities of the [logstash-logback-encoder](https://github.com/logstash/logstash-logback-encoder), which originally provided the ability to specify custom JSON fields in Logstash entries.
 
 ## Configuration
 ### Sample XML Configuration
@@ -52,7 +52,7 @@ One of the additional features this appender provides is based on the capabiliti
   - A maximum queue size for log messages to be stored in memory. If this fills up and log messages are not posted to Splunk in a timely manner, then the queue will cause blocking to occur on subsequent appends. 
   - 1000 *(default)*
 - `<buffer>`
-  - Log messages are buffered in memory off of the queue. Once a buffer is filled, logs are instantly posted to HEC endpoint.
+  - Log messages are buffered in memory off of the queue. Once a buffer is filled, logs are instantly posted to the HEC endpoint. This size also signifies the maximum payload size sent to the endpoint.
   - 25 *(default)*
 - `<flush>`
   - Specifies a timeout in seconds in which the buffer should be flushed regardless of the current number of logs in it. This ensures log messages don't stagnate.

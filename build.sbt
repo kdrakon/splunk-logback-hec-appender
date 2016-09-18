@@ -10,8 +10,6 @@ unmanagedResourceDirectories in Compile += baseDirectory.value / "conf"
 
 libraryDependencies ++= Seq(
 
-  //"org.http4s" %% "http4s-async-http-client" % "0.14.6a",
-  //"org.asynchttpclient" % "async-http-client" % "2.0.14",
   "org.skinny-framework" %% "skinny-http-client" % "2.2.0",
 
   "org.json4s" %% "json4s-native" % "3.4.0",
