@@ -4,19 +4,17 @@ import org.slf4j.LoggerFactory
 
 object Test extends App {
 
-  new Thread {
-    override def run = {
-      try {
-        class Blah {
-          val n = 0
-          val x = 123 / n
-        }
-        new Blah()
-      } catch {
-        case e: Throwable => LoggerFactory.getLogger("test").error("IN THREAD 2", e)
+  for (i <- 1 to 19) {
+    try {
+      class Blah {
+        val n = 0
+        val x = 123 / n
       }
+      new Blah()
+    } catch {
+      case e: Throwable => LoggerFactory.getLogger("test").error("IN THREAD", e)
     }
-  }.start()
+  }
 
-  Thread.sleep(30000)
+  Thread.sleep(60000)
 }

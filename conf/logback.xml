@@ -10,7 +10,8 @@
     <appender name="splunk" class="io.policarp.logback.SplunkHecAppender">
 
         <splunkUrl>htttp://somewhere.com/</splunkUrl>
-        <buffer>1</buffer>
+        <buffer>10</buffer>
+        <flush>10</flush>
 
         <layout class="io.policarp.logback.SplunkHecJsonLayout">
             <source>testing-sean</source>

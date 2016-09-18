@@ -27,6 +27,16 @@ trait SplunkHecClient {
   def postTask(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]): Task[Unit]
 }
 
+object SplunkHecClient {
+
+  /**
+   * Creates a newline separated list of individual Splunk JSON events
+   */
+  def prepareJsonEvents(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]): String = {
+    events.map(event => layout.doLayout(event)).mkString("\n\n")
+  }
+}
+
 package object skinnyhttp {
 
   /**
@@ -34,19 +44,20 @@ package object skinnyhttp {
    */
   trait SkinnyHecClient extends SplunkHecClient {
 
+    import SplunkHecClient.prepareJsonEvents
+
     implicit val ec: ExecutionContext
 
     override def postTask(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]) = Task[Unit] {
 
-      events.foreach(event => {
+      val jsonEvents = prepareJsonEvents(events)
 
-        val request =
-          Request(splunkUrl)
-            .header("Authorization", s"Splunk ${Option(token).getOrElse("")}")
-            .body(layout.doLayout(event).getBytes(Charset.forName(HTTP.DEFAULT_CHARSET)), "application/json")
+      val request =
+        Request(splunkUrl)
+          .header("Authorization", s"Splunk ${Option(token).getOrElse("")}")
+          .body(jsonEvents.getBytes(Charset.forName(HTTP.DEFAULT_CHARSET)), "application/json")
 
-        HTTP.post(request)
-      })
+      HTTP.post(request)
     }
   }
 
