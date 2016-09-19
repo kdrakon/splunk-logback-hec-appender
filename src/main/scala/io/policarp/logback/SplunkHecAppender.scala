@@ -15,7 +15,6 @@ import scala.beans.BeanProperty
 import scala.concurrent.duration._
 
 class SplunkHecAppender extends SplunkHecAppenderBase with SkinnyHecClient {
-  implicit val ec = scala.concurrent.ExecutionContext.global // TODO replace
   this.addFilter(new SkinnyHttpLogFilter())
 }
 
