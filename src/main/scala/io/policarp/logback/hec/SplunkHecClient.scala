@@ -17,14 +17,23 @@ trait SplunkHecClient {
   @BeanProperty var splunkUrl: String = ""
   @BeanProperty var token: String = ""
 
+  type AbstractRequest
+  type PreparedRequest = (Seq[ILoggingEvent], LayoutBase[ILoggingEvent]) => Option[AbstractRequest]
+
+  private[hec] def prepareRequest: PreparedRequest
+
+  private[hec] def executeRequest(abstractRequest: AbstractRequest): Unit
+
   /**
    * The Task responsible for posting the logs to the Splunk Cloud API endpoint
    *
    * @param events the ILoggingEvent's in batch that are ready to be posted to Splunk
    * @param layout the layout to use when posting the events
-   * @return Unit the Monix Task will asynchronously perform the job of posting the logs and will return Unit
+   * @return the Monix Task will asynchronously perform the job of posting the logs and will return Unit
    */
-  def postTask(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]): Task[Unit]
+  def postTask(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]): Task[Unit] = Task {
+    prepareRequest(events, layout).foreach(executeRequest)
+  }
 }
 
 object SplunkHecClient {
@@ -32,7 +41,7 @@ object SplunkHecClient {
   /**
    * Creates a newline separated list of individual Splunk JSON events
    */
-  def prepareJsonEvents(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]): Option[String] = {
+  def formatJsonEvents(events: Seq[ILoggingEvent], layout: LayoutBase[ILoggingEvent]): Option[String] = {
     events match {
       case Nil => None
       case _ => Some(events.map(event => layout.doLayout(event)).mkString("\n\n"))
@@ -43,24 +52,26 @@ object SplunkHecClient {
 package object skinnyhttp {
 
   /**
-   * An implementation of SplunkHttpEventCollectorClient using the skinny-framework's HTTP client
+   * An implementation of SplunkHecClient using the skinny-framework's HTTP client
    */
   trait SkinnyHecClient extends SplunkHecClient {
 
-    import SplunkHecClient.prepareJsonEvents
+    import SplunkHecClient.formatJsonEvents
 
     implicit val ec: ExecutionContext
 
-    override def postTask(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]) = Task[Unit] {
+    override type AbstractRequest = skinny.http.Request
 
-      prepareJsonEvents(events).foreach(jsonEvents => {
-        val request =
-          Request(splunkUrl)
-            .header("Authorization", s"Splunk ${Option(token).getOrElse("")}")
-            .body(jsonEvents.getBytes(Charset.forName(HTTP.DEFAULT_CHARSET)), "application/json")
-
-        HTTP.post(request)
+    override private[hec] def prepareRequest = (events, layout) => {
+      formatJsonEvents(events, layout).map(jsonEvents => {
+        Request(splunkUrl)
+          .header("Authorization", s"Splunk ${Option(token).getOrElse("")}")
+          .body(jsonEvents.getBytes(Charset.forName(HTTP.DEFAULT_CHARSET)), "application/json")
       })
+    }
+
+    override private[hec] def executeRequest(request: Request) = {
+      HTTP.post(request)
     }
   }
 
