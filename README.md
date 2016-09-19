@@ -2,6 +2,9 @@
 
 **still under construction**
 
+[![Build Status](https://travis-ci.org/kdrakon/splunk-logback-hec-appender.svg?branch=master)](https://travis-ci.org/kdrakon/splunk-logback-hec-appender)
+[![](https://jitpack.io/v/kdrakon/splunk-logback-hec-appender.svg)](https://jitpack.io/#kdrakon/splunk-logback-hec-appender)
+
 This is a [Logback Appender](http://logback.qos.ch/manual/appenders.html) made for Splunk's HTTP Event Collector (HEC) API. Splunk provides their [own appenders](https://github.com/splunk/splunk-library-javalogging), but at the time of this libraries creation, the Logback one was quite limited in terms of configuration and the data you could append to log indexes. This appender provides much more logging data than the current standard Splunk appender — which supplies only log fields for *message* and *severity*. With the addition of JSON fields containing more logging metadata, complex Splunk search queries can be written. This can potentially lead to better insight into your application.
 
 Some of the inspiration for this appender is based on the capabilities of the [logstash-logback-encoder](https://github.com/logstash/logstash-logback-encoder), which originally provided the ability to specify custom JSON fields in Logstash entries.
