@@ -10,7 +10,6 @@ import monix.eval.Task
 import skinny.http.{ HTTP, Request }
 
 import scala.beans.BeanProperty
-import scala.concurrent.ExecutionContext
 
 trait SplunkHecClient {
 
@@ -57,8 +56,6 @@ package object skinnyhttp {
   trait SkinnyHecClient extends SplunkHecClient {
 
     import SplunkHecClient.formatJsonEvents
-
-    implicit val ec: ExecutionContext
 
     override type AbstractRequest = skinny.http.Request
 

@@ -10,8 +10,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{ Matchers, WordSpec }
 import skinny.http.{ HTTP, Request }
 
-import scala.concurrent.ExecutionContext
-
 class SkinnyHecClientTest extends WordSpec with Matchers with ScalaFutures {
 
   val layout = new LayoutBase[ILoggingEvent] {
@@ -19,7 +17,6 @@ class SkinnyHecClientTest extends WordSpec with Matchers with ScalaFutures {
   }
 
   trait TestClient extends SkinnyHecClient {
-    override implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
     this.setSplunkUrl("https://somewhere.com")
     this.setToken("a-real-token")
   }
