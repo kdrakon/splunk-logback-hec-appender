@@ -69,7 +69,8 @@ class SplunkHecJsonLayoutTest extends WordSpec with Matchers {
       val layout = new SplunkHecJsonLayout
       layout.setMaxStackTrace(5)
       layout.setCustom("custom1=val1")
-      layout.setCustom("custom2=val2")
+      layout.setCustom("custom2=val2 ")
+      layout.setCustom("  custom3 =  val3    ")
       layout.setHost("test-host")
       layout.setIndex("test-index")
       layout.setSource("test-source")
@@ -82,7 +83,7 @@ class SplunkHecJsonLayoutTest extends WordSpec with Matchers {
       val event = MockLoggingEvent("SomeClass", "failure", Level.ERROR, stacktrace)
 
       layout.doLayout(event) shouldBe {
-        """{"time":0,"event":{"message":"failure","level":"ERROR","thread":"fake-thread","logger":"SomeClass","exception":": failure\n","stacktrace":["errorClass.someMethod(someFile:1)","errorClass.someMethod(someFile:2)","errorClass.someMethod(someFile:3)","errorClass.someMethod(someFile:4)","errorClass.someMethod(someFile:5)","..."],"customFields":{"custom2":"val2","custom1":"val1"}},"host":"test-host","source":"test-source","sourcetype":"test-sourcetype","index":"test-index"}"""
+        """{"time":0,"event":{"message":"failure","level":"ERROR","thread":"fake-thread","logger":"SomeClass","exception":": failure\n","stacktrace":["errorClass.someMethod(someFile:1)","errorClass.someMethod(someFile:2)","errorClass.someMethod(someFile:3)","errorClass.someMethod(someFile:4)","errorClass.someMethod(someFile:5)","..."],"customFields":{"custom2":"val2","custom1":"val1","custom3":"val3"}},"host":"test-host","source":"test-source","sourcetype":"test-sourcetype","index":"test-index"}"""
       }
     }
   }

@@ -88,7 +88,7 @@ case class SplunkHecJsonLayout() extends SplunkHecJsonLayoutBase {
 
   def setCustom(customField: String): Unit = {
     customField.split("=", 2) match {
-      case Array(key, value) => customFields += (key -> value)
+      case Array(key, value) => customFields += (key.trim -> value.trim)
       case _ => // ignoring anything else
     }
   }
