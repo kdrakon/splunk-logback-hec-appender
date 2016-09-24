@@ -21,13 +21,13 @@ class SplunkHecAppender extends SplunkHecAppenderBase with SkinnyHecClient {
 trait SplunkHecAppenderBase extends AppenderBase[ILoggingEvent] {
   self: SplunkHecClient =>
 
-  private implicit val scheduler = Scheduler.Implicits.global // TODO replace
-
   @BeanProperty var queue: Int = 1000
   @BeanProperty var buffer: Int = 25
   @BeanProperty var flush: Int = 30
   @BeanProperty var parallelism: Int = 8
   @BeanProperty var layout: SplunkHecJsonLayoutBase = new SplunkHecJsonLayout()
+
+  private implicit val scheduler = Scheduler.computation(parallelism)
 
   private lazy val logPublisher = new LogPublisher(queue)
   private lazy val logStream = Observable.fromReactivePublisher(logPublisher).bufferTimedAndCounted(flush seconds, buffer)
