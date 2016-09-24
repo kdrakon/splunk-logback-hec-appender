@@ -1,6 +1,6 @@
 package io.policarp.logback
 
-import java.util.concurrent.{ Executors, ForkJoinPool }
+import java.util.concurrent.ForkJoinPool
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 

@@ -1,6 +1,6 @@
 package io.policarp.logback
 
-import ch.qos.logback.classic.pattern.{ ExtendedThrowableProxyConverter, _ }
+import ch.qos.logback.classic.pattern._
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.LayoutBase
 import io.policarp.logback.json.{ BaseJson, FullEventJson }
