@@ -62,6 +62,7 @@ Some of the inspiration for this appender is based on the capabilities of the [l
   - 30 *(default)*
 - `<parallelism>`
   - Log messages are posted to the HEC endpoint in parallel. This number specifies how many parallel posts should happen asynchronously.
+  - defaults to number of CPU cores
   
 The appender also supports the addition of [Logback Filter's](http://logback.qos.ch/manual/filters.html) — see the XML example above.
 

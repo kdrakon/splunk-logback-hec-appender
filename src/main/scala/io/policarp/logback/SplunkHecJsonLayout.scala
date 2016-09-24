@@ -78,7 +78,7 @@ object SplunkHecJsonLayout {
  * This layout provides a 'good' amount of logging data from an ILoggingEvent. It also supports
  * custom fields to append to every log message configurable via Logback.
  */
-class SplunkHecJsonLayout extends SplunkHecJsonLayoutBase {
+case class SplunkHecJsonLayout() extends SplunkHecJsonLayoutBase {
 
   import SplunkHecJsonLayout._
 

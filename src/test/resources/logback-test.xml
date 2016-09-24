@@ -13,6 +13,8 @@
         <buffer>10</buffer>
         <flush>10</flush>
 
+        <appenderStrategy class="io.policarp.logback.AsyncSplunkHecAppenderStrategy"/>
+
         <layout class="io.policarp.logback.SplunkHecJsonLayout">
             <source>testing-sean</source>
             <custom>user=${USER}</custom>
