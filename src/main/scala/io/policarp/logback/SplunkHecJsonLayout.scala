@@ -1,6 +1,6 @@
 package io.policarp.logback
 
-import ch.qos.logback.classic.pattern.{ ExtendedThrowableProxyConverter, _ }
+import ch.qos.logback.classic.pattern._
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.LayoutBase
 import io.policarp.logback.json.{ BaseJson, FullEventJson }
@@ -78,7 +78,7 @@ object SplunkHecJsonLayout {
  * This layout provides a 'good' amount of logging data from an ILoggingEvent. It also supports
  * custom fields to append to every log message configurable via Logback.
  */
-class SplunkHecJsonLayout extends SplunkHecJsonLayoutBase {
+case class SplunkHecJsonLayout() extends SplunkHecJsonLayoutBase {
 
   import SplunkHecJsonLayout._
 
@@ -88,7 +88,7 @@ class SplunkHecJsonLayout extends SplunkHecJsonLayoutBase {
 
   def setCustom(customField: String): Unit = {
     customField.split("=", 2) match {
-      case Array(key, value) => customFields += (key -> value)
+      case Array(key, value) => customFields += (key.trim -> value.trim)
       case _ => // ignoring anything else
     }
   }

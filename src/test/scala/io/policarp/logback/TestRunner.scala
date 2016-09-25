@@ -2,7 +2,7 @@ package io.policarp.logback
 
 import org.slf4j.LoggerFactory
 
-object Test extends App {
+object TestRunner extends App {
 
   for (i <- 1 to 19) {
     try {

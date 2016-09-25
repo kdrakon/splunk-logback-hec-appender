@@ -6,8 +6,6 @@ scalaVersion := "2.11.8"
 
 scalacOptions += "-target:jvm-1.8"
 
-unmanagedResourceDirectories in Compile += baseDirectory.value / "conf"
-
 libraryDependencies ++= Seq(
 
   "org.skinny-framework" %% "skinny-http-client" % "2.2.0",

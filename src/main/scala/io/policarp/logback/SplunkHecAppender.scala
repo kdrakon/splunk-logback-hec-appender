@@ -21,15 +21,16 @@ class SplunkHecAppender extends SplunkHecAppenderBase with SkinnyHecClient {
 trait SplunkHecAppenderBase extends AppenderBase[ILoggingEvent] {
   self: SplunkHecClient =>
 
-  private implicit val scheduler = Scheduler.Implicits.global // TODO replace
-
   @BeanProperty var queue: Int = 1000
   @BeanProperty var buffer: Int = 25
   @BeanProperty var flush: Int = 30
-  @BeanProperty var parallelism: Int = 8
-  @BeanProperty var layout: SplunkHecJsonLayoutBase = new SplunkHecJsonLayout()
+  @BeanProperty var parallelism: Int = Runtime.getRuntime.availableProcessors()
+  @BeanProperty var layout: SplunkHecJsonLayoutBase = SplunkHecJsonLayout()
+  @BeanProperty var appenderStrategy: SplunkHecAppenderStrategy = BlockingSplunkHecAppenderStrategy()
 
-  private lazy val logPublisher = new LogPublisher(queue)
+  private implicit val scheduler = Scheduler.computation(parallelism)
+
+  private implicit lazy val logPublisher = new LogPublisher(queue)
   private lazy val logStream = Observable.fromReactivePublisher(logPublisher).bufferTimedAndCounted(flush seconds, buffer)
   private lazy val logConsumer = Consumer.foreachParallelAsync[Task[Unit]](parallelism)(task => task)
 
@@ -39,16 +40,10 @@ trait SplunkHecAppenderBase extends AppenderBase[ILoggingEvent] {
     logStream.map(postTask).runWith(logConsumer).runAsync
   }
 
-  override def append(event: ILoggingEvent) = {
-    Option(event).foreach(e => {
-      event.prepareForDeferredProcessing()
-      event.getCallerData
-      logPublisher.enqueue(event) // TODO add async feature and overflow strategy
-    })
-  }
+  override def append(event: ILoggingEvent) = appenderStrategy.append(event)
 }
 
-private class LogPublisher(queueSize: Int)(implicit scheduler: Scheduler) extends Publisher[ILoggingEvent] {
+private[logback] class LogPublisher(queueSize: Int)(implicit scheduler: Scheduler) extends Publisher[ILoggingEvent] {
 
   val logQueue = new LinkedBlockingQueue[ILoggingEvent](queueSize)
 
