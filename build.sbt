@@ -1,6 +1,6 @@
 name := """splunk-logback-hec-appender"""
 
-version := "1.0"
+version := "1.0.1"
 
 scalaVersion := "2.11.8"
 
@@ -12,7 +12,7 @@ libraryDependencies ++= Seq(
 
   "org.json4s" %% "json4s-native" % "3.4.0",
 
-  "io.monix" %% "monix" % "2.0.1",
+  "io.monix" %% "monix" % "2.0.2",
 
   "ch.qos.logback" % "logback-core" % "1.1.7",
   "ch.qos.logback" % "logback-classic" % "1.1.7",
