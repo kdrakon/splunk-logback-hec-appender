@@ -18,9 +18,9 @@ class SkinnyHttpLogFilterTest extends WordSpec with Matchers {
       filter.decide(event) shouldBe DENY
     }
 
-    "accept out logging events for anything else" in {
+    "be neutral on logging events for anything else" in {
       val event = MockLoggingEvent("SomeClass", "test 2", Level.DEBUG)
-      filter.decide(event) shouldBe ACCEPT
+      filter.decide(event) shouldBe NEUTRAL
     }
   }
 

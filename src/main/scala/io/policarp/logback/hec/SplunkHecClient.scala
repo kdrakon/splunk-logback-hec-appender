@@ -85,7 +85,7 @@ package object skinnyhttp {
       if (event.getLoggerName.startsWith(HttpLoggerName)) {
         FilterReply.DENY
       } else {
-        FilterReply.ACCEPT
+        FilterReply.NEUTRAL
       }
     }
   }
