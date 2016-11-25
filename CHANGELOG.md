@@ -1,5 +1,7 @@
 # Changelog
 
+## Updated dependencies to latest versions.
+
 ## 1.0.2
 ## Fixed
 - [issue #7](https://github.com/kdrakon/splunk-logback-hec-appender/issues/7): ThresholdFilter not working
