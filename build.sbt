@@ -1,6 +1,6 @@
 name := """splunk-logback-hec-appender"""
 
-version := "1.0.2"
+version := "1.0.3"
 
 scalaVersion := "2.11.8"
 

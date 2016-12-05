@@ -1,6 +1,7 @@
 # Changelog
 
-## Updated dependencies to latest versions.
+## 1.0.3
+- Updated dependencies to latest versions.
 
 ## 1.0.2
 ## Fixed
