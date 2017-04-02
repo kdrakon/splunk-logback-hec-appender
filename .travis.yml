@@ -4,9 +4,10 @@ language: scala
 
 scala:
   - 2.11.8
+  - 2.12.1
 
 jdk:
   - oraclejdk8
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport
+  - sbt ++$TRAVIS_SCALA_VERSION clean test
