@@ -1,15 +1,16 @@
 package io.policarp.logback
 
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ConcurrentLinkedQueue
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.AppenderBase
 import io.policarp.logback.hec.SplunkHecClient
-import io.policarp.logback.hec.skinnyhttp.{ SkinnyHecClient, SkinnyHttpLogFilter }
-import monix.eval.Task
+import io.policarp.logback.hec.skinnyhttp.{SkinnyHecClient, SkinnyHttpLogFilter}
+import monix.eval.{Task, TaskCircuitBreaker}
 import monix.execution.Scheduler
-import monix.reactive.{ Consumer, Observable }
-import org.reactivestreams.{ Publisher, Subscriber, Subscription }
+import monix.execution.atomic.AtomicLong
+import monix.reactive.{Consumer, Observable}
+import org.reactivestreams.{Publisher, Subscriber, Subscription}
 
 import scala.beans.BeanProperty
 import scala.concurrent.duration._
@@ -21,33 +22,38 @@ class SplunkHecAppender extends SplunkHecAppenderBase with SkinnyHecClient {
 trait SplunkHecAppenderBase extends AppenderBase[ILoggingEvent] {
   self: SplunkHecClient =>
 
-  @BeanProperty var queue: Int = 1000
   @BeanProperty var buffer: Int = 25
   @BeanProperty var flush: Int = 30
   @BeanProperty var parallelism: Int = Runtime.getRuntime.availableProcessors()
   @BeanProperty var layout: SplunkHecJsonLayoutBase = SplunkHecJsonLayout()
-  @BeanProperty var appenderStrategy: SplunkHecAppenderStrategy = BlockingSplunkHecAppenderStrategy()
 
   private implicit val scheduler = Scheduler.computation(parallelism)
 
-  private implicit lazy val logPublisher = new LogPublisher(queue)
+  private implicit lazy val logPublisher = new LogPublisher()
   private lazy val logStream = Observable.fromReactivePublisher(logPublisher).bufferTimedAndCounted(flush seconds, buffer)
   private lazy val logConsumer = Consumer.foreachParallelAsync[Task[Unit]](parallelism)(task => task)
 
   override def start() = {
     super.start()
     implicit val impliedLayout = layout
-    logStream.map(postTask).runWith(logConsumer).runAsync
+    logStream.map(postTask).consumeWith(logConsumer).runAsync
   }
 
-  override def append(event: ILoggingEvent) = appenderStrategy.append(event)
+  override def append(event: ILoggingEvent) = logPublisher.enqueue(event)
 }
 
-private[logback] class LogPublisher(queueSize: Int)(implicit scheduler: Scheduler) extends Publisher[ILoggingEvent] {
+private[logback] class LogPublisher()(implicit scheduler: Scheduler) extends Publisher[ILoggingEvent] {
 
-  val logQueue = new LinkedBlockingQueue[ILoggingEvent](queueSize)
+  val logQueue = new ConcurrentLinkedQueue[ILoggingEvent]()
 
-  def enqueue(event: ILoggingEvent) = logQueue.put(event)
+  private val LogPublisherCircuitBreaker = TaskCircuitBreaker (
+    maxFailures = 5,
+    resetTimeout = 10 nanos,
+    exponentialBackoffFactor = 2,
+    maxResetTimeout = 1 minute
+  )
+
+  def enqueue(event: ILoggingEvent) = logQueue.add(event)
 
   override def subscribe(subscriber: Subscriber[_ >: ILoggingEvent]) = {
     subscriber.onSubscribe(new Subscription {
@@ -57,11 +63,20 @@ private[logback] class LogPublisher(queueSize: Int)(implicit scheduler: Schedule
       override def cancel() = { cancelled = true }
 
       override def request(n: Long) = if (!cancelled) {
-        Task {
-          for (i <- 1L to n) {
-            subscriber.onNext(logQueue.take())
+        val requests = AtomicLong(n)
+        val pollingTask = Task {
+          val currentRequests = requests.get
+          for (_ <- 1L to currentRequests) {
+            Option(logQueue.poll()) match {
+              case None =>
+                throw new IllegalStateException("logQueue is empty") // so trigger circuit breaker
+              case Some(event) =>
+                subscriber.onNext(event)
+                requests.decrement()
+            }
           }
-        }.runAsync
+        }
+        LogPublisherCircuitBreaker.protect(pollingTask).onErrorRestartIf(_ => requests.get != 0).runAsync
       }
     })
   }

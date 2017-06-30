@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0
+## Fixed
+- provides fix for dead-lock caused by unseen synchronized block caused by ch.qos.logback.core.AppenderBase
+- the fix for the dead-lock is addressed by removing the use of blocking queue for logging events. As a result, this also removed the need for SplunkHecAppenderStrategy's
+## Changed
+- additionally, added Monix circuit breakers around consuming the log event stream and pushing data to Splunk via HTTP
+- updated Monix to 2.3.0
+- cross compiling to Scala 2.11.11 and 2.12.2
+
 ## 1.0.3
 - Updated dependencies to latest versions.
 

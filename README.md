@@ -10,9 +10,8 @@ Some of the inspiration for this appender is based on the capabilities of the [l
 It is implemented using the principles of reactive streams. This was very straightforwardly done using the [Monix library](https://monix.io/).
 
 ## Compatability
-- developed using **Scala 2.11.8**
 - due to the use of the Skinny Framework's HTTP client, the minimum **Java** version is **8**. However, I haven't tested the appender in a Java project yet. Technically, it should be compatible, but please let me know if it definitely works.
-- I have tested the appender against an Enterprise Splunk Cloud HTTP Event Collector (*version 6.4.1.2*).
+- I have tested the appender against the Enterprise Splunk Cloud HTTP Event Collector (*version 6.6.1*).
 
 ## Configuration
 ### Sample XML Configuration
@@ -56,9 +55,6 @@ It is implemented using the principles of reactive streams. This was very straig
 - `<token>`
   - The token that authorizes posting to the HEC endpoint
   - e.g. _1234-5678-91011-ABC-321_
-- `<queue>`
-  - A maximum queue size for log messages to be stored in memory. If this fills up and log messages are not posted to Splunk in a timely manner, then the queue will by default cause blocking to occur on subsequent appends (see [alternatives](#splunkhecappenderstrategy) to this below). 
-  - 1000 *(default)*
 - `<buffer>`
   - Log messages are buffered in memory off of the queue. Once a buffer is filled, logs are instantly posted to the HEC endpoint. This size also signifies the maximum payload size sent to the endpoint.
   - 25 *(default)*
@@ -120,25 +116,6 @@ package object json {
   
   ####Custom Layout
   You can override the layout with a class extending either `SplunkHecJsonLayout`,`SplunkHecJsonLayoutBase`, or `LayoutBase[ILoggingEvent]`. Then `<layout>` can be specified in the `<appender>` section — see the XML example above
-  
-###SplunkHecAppenderStrategy
-
-By default, `SplunkHecAppender` will use the calling thread (i.e. a thread from your application) when queueing new log messages on to the internal queue. If that queue happens to be full, possibly because the Splunk HEC API requests are taking too long, then blocking can take more time. This default behaviour is defined by the _appender strategy_ `BlockingSplunkHecAppenderStrategy`. There exists two more strategies:
-
-- `AsyncSplunkHecAppenderStrategy`
-  - This strategy uses an internal executor service (a `ForkJoinPool`) to asynchronously enqueue new log events. If the queue is full, your applications thread won't block. However, this means that background queue tasks could pile up if the queue is not drained fast enough (again, usually due to slowness with HTTP requests to the Splunk HEC). By default, the executor services parallelism factor is equal to the number of CPU cores available to the VM. This can be overridden with the `parallelism` setting.
-```xml
-<!-- add this to your appender section -->
-<appenderStrategy class="io.policarp.logback.AsyncSplunkHecAppenderStrategy">
-    <parallelism>8</parallelism>
-</appenderStrategy>
-```
-- `SpillingSplunkHecAppenderStrategy`
-  - This strategy simply drops logging events when the internal queue has been filled up. Logging events will resume to be streamed to the Splunk HEC once the queue has the capacity again. However, due to the concurrent nature of the internal queue, the capacity check performed can't be guaranteed, so edge cases of the queues capacity can cause some blocking of your applications calling thread.
-```xml
-<!-- add this to your appender section -->
-<appenderStrategy class="io.policarp.logback.SpillingSplunkHecAppenderStrategy"/>
-```
 
 ## HTTP Client
 The base implementation uses the [skinny-framework's HTTP client](https://github.com/skinny-framework/skinny-framework). It is a tiny library and does not bring with it many dependencies. `SplunkHecAppender` uses `SkinnyHttpHecClient` for HTTP communication.
