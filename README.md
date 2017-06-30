@@ -48,7 +48,7 @@ It is implemented using the principles of reactive streams. This was very straig
 ```
 
 ### SplunkHecAppender
-####Logback Configuration
+#### Logback Configuration
 - `<splunkUrl>`
   - The URL of the HEC endpoint 
   - e.g. https://somewhere.splunkcloud.com/services/collector/event
