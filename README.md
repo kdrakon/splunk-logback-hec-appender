@@ -100,7 +100,7 @@ package object json {
 }
 ```
 
-####Logback Configuration
+#### Logback Configuration
 - `<custom>`
   - A custom field that is appended to log messages (under the JSON field `customFields`). This must be encoded as individual `<custom>` tags with key-value pairs separated by an equal (`=`) sign. For example:
     - applicationVersion=${GIT_APP_VERSION}
@@ -114,7 +114,7 @@ package object json {
   - `<index>`
   - `<host>`
   
-  ####Custom Layout
+  #### Custom Layout
   You can override the layout with a class extending either `SplunkHecJsonLayout`,`SplunkHecJsonLayoutBase`, or `LayoutBase[ILoggingEvent]`. Then `<layout>` can be specified in the `<appender>` section — see the XML example above
 
 ## HTTP Client
