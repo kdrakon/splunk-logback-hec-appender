@@ -6,12 +6,14 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.LayoutBase
 import ch.qos.logback.core.filter.Filter
 import ch.qos.logback.core.spi.FilterReply
-import monix.eval.Task
-import skinny.http.{ HTTP, Request }
+import monix.eval.{Task, TaskCircuitBreaker}
+import skinny.http.{HTTP, Request}
 
 import scala.beans.BeanProperty
+import scala.concurrent.duration._
 
 trait SplunkHecClient {
+  import SplunkHecClient._
 
   @BeanProperty var splunkUrl: String = ""
   @BeanProperty var token: String = ""
@@ -30,12 +32,23 @@ trait SplunkHecClient {
    * @param layout the layout to use when posting the events
    * @return the Monix Task will asynchronously perform the job of posting the logs and will return Unit
    */
-  def postTask(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]): Task[Unit] = Task {
-    prepareRequest(events, layout).foreach(executeRequest)
+  def postTask(events: Seq[ILoggingEvent])(implicit layout: LayoutBase[ILoggingEvent]): Task[Unit] = {
+    SplunkHecClientCircuitBreaker.protect(
+      Task {
+        prepareRequest(events, layout).foreach(executeRequest)
+      }
+    )
   }
 }
 
 object SplunkHecClient {
+
+  private[hec] val SplunkHecClientCircuitBreaker = TaskCircuitBreaker (
+    maxFailures = 5,
+    resetTimeout = 5 seconds,
+    exponentialBackoffFactor = 2,
+    maxResetTimeout = 10 minute
+  )
 
   /**
    * Creates a newline separated list of individual Splunk JSON events
