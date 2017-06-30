@@ -4,7 +4,9 @@ import org.slf4j.LoggerFactory
 
 object TestRunner extends App {
 
-  for (i <- 1 to 19) {
+  val logger = LoggerFactory.getLogger("test")
+
+  for (i <- 1 to 1023) {
     try {
       class Blah {
         val n = 0
@@ -12,9 +14,14 @@ object TestRunner extends App {
       }
       new Blah()
     } catch {
-      case e: Throwable => LoggerFactory.getLogger("test").error("IN THREAD", e)
+      case e: Throwable => logger.error("IN THREAD", e)
     }
   }
+
+  Thread.sleep(5000)
+
+  logger.info("done sleep")
+  logger.info("...going for longer sleep")
 
   Thread.sleep(60000)
 }

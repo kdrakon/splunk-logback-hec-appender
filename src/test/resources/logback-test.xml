@@ -9,11 +9,11 @@
 
     <appender name="splunk" class="io.policarp.logback.SplunkHecAppender">
 
-        <splunkUrl>htttp://somewhere.com/</splunkUrl>
+        <!--use start-local-splunk.sh-->
+        <splunkUrl>http://localhost:8088/services/collector/event</splunkUrl>
+        <token>A106745E-0F59-40FE-AF3A-4BAE49759791</token>
         <buffer>10</buffer>
         <flush>10</flush>
-
-        <appenderStrategy class="io.policarp.logback.AsyncSplunkHecAppenderStrategy"/>
 
         <layout class="io.policarp.logback.SplunkHecJsonLayout">
             <source>testing-sean</source>

@@ -10,9 +10,8 @@ Some of the inspiration for this appender is based on the capabilities of the [l
 It is implemented using the principles of reactive streams. This was very straightforwardly done using the [Monix library](https://monix.io/).
 
 ## Compatability
-- developed using **Scala 2.11.8**
 - due to the use of the Skinny Framework's HTTP client, the minimum **Java** version is **8**. However, I haven't tested the appender in a Java project yet. Technically, it should be compatible, but please let me know if it definitely works.
-- I have tested the appender against an Enterprise Splunk Cloud HTTP Event Collector (*version 6.4.1.2*).
+- I have tested the appender against an Enterprise Splunk Cloud HTTP Event Collector (*version 6.6.1*).
 
 ## Configuration
 ### Sample XML Configuration

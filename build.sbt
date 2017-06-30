@@ -1,7 +1,7 @@
 name := """splunk-logback-hec-appender"""
-version := "1.0.3"
-scalaVersion := "2.12.1"
-crossScalaVersions := Seq("2.11.8", "2.12.1")
+version := "1.1.0"
+scalaVersion := "2.12.2"
+crossScalaVersions := Seq("2.11.11", "2.12.2")
 organization := "io.policarp"
 homepage := Some(url("https://github.com/kdrakon/splunk-logback-hec-appender"))
 scmInfo := Some(
