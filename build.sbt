@@ -19,7 +19,7 @@ libraryDependencies ++= Seq(
 
   "org.json4s" %% "json4s-native" % "3.5.0",
 
-  "io.monix" %% "monix" % "2.1.1",
+  "io.monix" %% "monix" % "2.3.0",
 
   "ch.qos.logback" % "logback-core" % "1.1.7",
   "ch.qos.logback" % "logback-classic" % "1.1.7",
