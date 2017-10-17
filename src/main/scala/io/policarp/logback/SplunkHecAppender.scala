@@ -55,6 +55,12 @@ private[logback] class LogPublisher()(implicit scheduler: Scheduler) extends Pub
 
   def enqueue(event: ILoggingEvent) = logQueue.add(event)
 
+  implicit class SlowRestartingTask[A](t: Task[A]) {
+    def onErrorRestartDelayedIf(delay: FiniteDuration)(p: (Throwable) => Boolean): Task[A] = {
+      t.delayExecution(delay).onErrorHandleWith(ex => if (p(ex)) t.onErrorRestartDelayedIf(delay)(p) else Task.raiseError(ex))
+    }
+  }
+
   override def subscribe(subscriber: Subscriber[_ >: ILoggingEvent]) = {
     subscriber.onSubscribe(new Subscription {
 
@@ -76,7 +82,7 @@ private[logback] class LogPublisher()(implicit scheduler: Scheduler) extends Pub
             }
           }
         }
-        LogPublisherCircuitBreaker.protect(pollingTask).onErrorRestartIf(_ => requests.get != 0).runAsync
+        LogPublisherCircuitBreaker.protect(pollingTask).onErrorRestartDelayedIf(20.millis)(_ => requests.get != 0).runAsync
       }
     })
   }
